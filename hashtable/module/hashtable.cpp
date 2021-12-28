@@ -1,103 +1,68 @@
-#include <iostream> 
+#include "hashtable.hpp" 
 using namespace std;
 
 
 //Class node 
-class Node {
-private: 
-    int _key;
-    string _value;
-    Node* next;
+Node :: Node(int key, string value ) {
+    _key = key;
+    _value = value;
+}
 
-public: 
-    Node(int key, string value ) {
-        _key = key;
-        _value = value;
+//Getter da chave
+int Node :: getKey() {
+    return _key;
+}
+
+//Getter do valor
+string Node :: getValue() {
+    return _value;
+}
+
+
+//Getter do próximo nodo
+Node** Node :: getNextP() {
+    return &_next;
+}
+
+//exception treatment recursive
+void Hashtable ::  _openningAddressing(Node** pointer, int key, string value) {
+    if( *pointer ) {
+        _openningAddressing((*pointer) -> getNextP(), key, value);
+        return; 
     }
+    *pointer = new Node(key, value);
+}
 
-    int getKey() {
-        return _key;
+//print auxiliar 
+void Hashtable ::  _printOpenAddress(Node** pointer) {
+    if( *pointer ) {
+        cout << "key: " << (*pointer) -> getKey() << " | value: " << (*pointer) -> getValue() << "  **open addressing** " << endl;
+        _printOpenAddress((*pointer) -> getNextP());
     }
+}
 
-    string getValue() {
-        return _value;
-    }
+//hash function method
+int Hashtable :: hashFunction(int key) {
+    return key % size + 1;
+}
 
-    Node* getNext() {
-        return this -> next;
-    }
-
-    void setNext(Node* node) {
-        this -> next = node;
-    }
-};
-
-
-//class hashtable
-class Hashtable {
-private:
-    int size = 100;
-    Node* table[1000];
-
+//add node
+void Hashtable :: put(int key, string value) {
+    //is empty
+    if( table[ this -> hashFunction(key)] == NULL )
+        table[ this -> hashFunction(key)] = new Node(key, value);
 
     //exception treatment
-    void openningAddressing(Node* pointer, int key, string value) {
-        while( pointer ) {
-            pointer = pointer -> getNext();
-        }
+    else _openningAddressing(table[this->hashFunction(key)] -> getNextP(), key, value);
+}
 
-        pointer = new Node(key, value);
+//show node
+void Hashtable :: __print__() {
+    cout << "hashtable: " << endl;
+    for( int i = 0; i < size; i++ ) {
+            if( table[i] != NULL ) {
+                cout << "key: " << table[i] -> getKey() <<  " | value: " << table[i] -> getValue() << endl;
+                _printOpenAddress(table[i] -> getNextP());
+            }
     }
-
-    void printOpenAddress(Node* pointer) {
-        while( pointer ) {
-            cout << "key: " << pointer -> getKey() << " | value: " << pointer -> getValue() << endl;
-            pointer = pointer -> getNext();
-            return; 
-        }
-
-        printf("entrei nessa treta!");
-    }
- 
-public:
-    //hash function method
-    int hashFunction(int key) {
-        return key % size + 1;
-    }
-
-    //add node
-    void put(int key, string value) {
-
-        //is empty
-        if( table[ this -> hashFunction(key)] == NULL )
-            this -> table[ this -> hashFunction(key)] = new Node(key, value);
-
-        //exception treatment
-        //else openningAddressing(table[this->hashFunction(key)]->getNext(), key, value);
-
-        else table[this->hashFunction(key)]->setNext(new Node(key, value));
-    }
-
-    //show node
-    void __print__() {
-        cout << "hashtable: " << endl;
-        for( int i = 0; i < size; i++ ) {
-                if( this -> table[i] != NULL ) {
-                    cout << "key: " << table[i] -> getKey() <<  " | value: " << table[i] -> getValue() << endl;
-                    printOpenAddress(table[i] -> getNext());
-                }
-        }
-    }
-
-};
-
-int main() {
-    Hashtable hashtable;
-
-    hashtable.put(0, "Pedro");
-    hashtable.put(0, "Pedro2");
-
-    hashtable.__print__();
-
-    return 0;
 }
