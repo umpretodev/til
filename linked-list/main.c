@@ -1,79 +1,62 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-typedef struct node {
-    char* name;
-    double price;
-    int token; 
-
-    //pointer to next
-    struct node* next;
-} Node;
-
-
-typedef struct list {
-    //pointers
-    Node* head; 
-    Node* tail;
-} List;
-
-
-//add pointer recursive
-void pushNode( List* list, char* name, double price, int token) {
-    if(!list->head) {
-        list->head = (Node *)malloc(sizeof(Node));
-        list->tail = (Node *)malloc(sizeof(Node));
-        
-        list->head->name = name;
-        list->head->price = price;
-        list->head->token = token;
-
-        list->tail = list->head;
-    }
-
-    else {
-        list->tail->next = (Node *)malloc(sizeof(Node));
-        list->tail = list->tail->next;
-        
-        list->tail->name = name;
-        list->tail->price = price;
-        list->tail->token = token;
-    }
-}
-
-//search pointer recursive
-void searchNode(Node* pointer, int token) {
-    if(pointer) {
-        if(pointer->token == token) {
-            printf("product: %s",pointer->name);
-        }
-
-        else searchNode(pointer->next, token);
-    }
-}
-
-//show list
-void __printf__( Node* pointer) {
-    if(pointer) {
-        printf("token: %d -> ", pointer->token);
-        __printf__(pointer->next);
-    }
-
-    else printf("/\n");
-}
-
+#include "module/linkedList.c"
 
 int main() {
+    int option;
+    
+    //node aux
+    char* name;
+    double price;
+    int token;
+
     List list; 
 
-    pushNode(&list, "arroz", 5.00, 1);
-    pushNode(&list, "feijão", 5.00, 2);
-    pushNode(&list, "feijão", 5.00, 3);
-    pushNode(&list, "feijão", 5.00, 4);
-    
-    __printf__(list.head);
+    do {
+        __menu__();
+
+        scanf("%d", &option);
+        printf("\n");
 
 
+        switch(option) {
+            
+            case 0:
+                printf("\n");
+                freeList(list.head);
+                break;
 
-    return 0;
+            case 1: 
+                printf("name: ");
+                scanf("%s", &name);
+
+                printf("price: ");
+                scanf("%lf", &price);
+
+                printf("token: ");
+                scanf("%d", &token);
+
+                pushNode(&list, name, price, token);
+                break;
+
+            case 2: 
+                printf("token: ");
+                scanf("%d", &token);
+
+                searchNode(list.head, token);
+                break;
+        }
+
+        if(option == 0) {
+            printf("\nlist: -> /\n");
+        }
+
+        else {
+            printf("\nlist: ");
+            __repr__(list.head);
+            printf("\n");
+        }  
+
+    } while (option);
+
+
+        return 0;
 }
